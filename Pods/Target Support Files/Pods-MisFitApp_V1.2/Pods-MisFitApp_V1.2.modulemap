@@ -1,0 +1,6 @@
+framework module Pods_MisFitApp_V1_2 {
+  umbrella header "Pods-MisFitApp_V1.2-umbrella.h"
+
+  export *
+  module * { export * }
+}

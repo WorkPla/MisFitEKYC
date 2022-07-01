@@ -1,0 +1,6 @@
+framework module FNineSeven {
+  umbrella header "FNineSeven-umbrella.h"
+
+  export *
+  module * { export * }
+}

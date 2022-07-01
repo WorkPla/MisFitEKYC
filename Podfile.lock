@@ -1,0 +1,28 @@
+PODS:
+  - BottomPopup (0.7.0)
+  - FNineSeven (0.2.1)
+  - IQKeyboardManagerSwift (6.5.10)
+  - MisFitSDK (1.1.3)
+
+DEPENDENCIES:
+  - BottomPopup
+  - FNineSeven
+  - IQKeyboardManagerSwift
+  - MisFitSDK
+
+SPEC REPOS:
+  trunk:
+    - BottomPopup
+    - FNineSeven
+    - IQKeyboardManagerSwift
+    - MisFitSDK
+
+SPEC CHECKSUMS:
+  BottomPopup: fe3e284628532f99093ae68c592c6b9d392c972d
+  FNineSeven: 104be2b40f899a4416e19708498b84b0d67914d2
+  IQKeyboardManagerSwift: 52962c76ab33532f15ad9f3ff4e5715eda5335bb
+  MisFitSDK: 613688c12db05448d26fe75aca2b8d41ccc58643
+
+PODFILE CHECKSUM: 3a96106d7afc34eb008cd34ae82b311290aaf07b
+
+COCOAPODS: 1.11.2
