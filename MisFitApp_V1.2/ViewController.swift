@@ -11,15 +11,22 @@ import FNineSeven
 
 class ViewController: UIViewController, UINavigationControllerDelegate {
     var selectedTag = -1
+//    private var tableModel = [
+//        "NRC INFO",
+//        "NRC SIDE INFO",
+//        "FACE DETECT",
+//        "FACE DETECT CAMERA",
+//        "FACE COMPARE",
+//        "PASSPORT DETAILS",
+//        "PASSPORT DETAILS",
+//        "CAMBODIAN NRC"
+//    ]
     private var tableModel = [
         "NRC INFO",
         "NRC SIDE INFO",
         "FACE DETECT",
-        "FACE DETECT CAMERA",
         "FACE COMPARE",
-        "PASSPORT DETAILS",
-        "PASSPORT DETAILS",
-        "CAMBODIAN NRC"
+        "PASSPORT DETAILS"
     ]
     private var responseData : Any?
     private var selectedApi = ""
@@ -74,23 +81,55 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
 }
 
 extension ViewController {
-    private func apiNRCDetails(img : UIImage) {
-        NineSeven00().addLoder(view: self.view)
-        let apiNRCDetailsApi = NRCDetailsApi()
-        apiNRCDetailsApi.apiRequestForNrcCDetails(media1: img) { jsonData in
+    private func ekyc_get_cardinfo(img : UIImage) {
+        let ekyc = EKYC()
+        ekyc.get_cardinfo(media1: img, cbm: false, filter: true, source: "other", check_age: false) { jsonData in
             self.responseData = jsonData
-            
             DispatchQueue.main.async {
                 self.gotoResponseView()
             }
         }
     }
-    private func apiNRCDetect(img : UIImage) {
-        NineSeven00().addLoder(view: self.view)
-        let apiNRCDetectApi = NRCDetectApi()
-        apiNRCDetectApi.apiRequestForNRCDetect(media1: img) { jsonData in
+    public func ekyc_get_cardside(img : UIImage) {
+        let ekyc = EKYC()
+        ekyc.get_cardside(media1: img) { jsonData in
             self.responseData = jsonData
-            
+            if let dict = jsonData as? [String: Any] {
+                let value = dict["type"] as! String
+                if value == "back" {
+                    
+                }
+                else {
+                    
+                }
+            }
+            DispatchQueue.main.async {
+                self.gotoResponseView()
+            }
+        }
+    }
+    public func ekyc_face_detect(img : UIImage) {
+        let ekyc = EKYC()
+        ekyc.get_face_detect(media1: img) { jsonData in
+            self.responseData = jsonData
+            DispatchQueue.main.async {
+                self.gotoResponseView()
+            }
+        }
+    }
+    public func ekyc_get_comp(img1 : UIImage, img2 : UIImage) {
+        let ekyc = EKYC()
+        ekyc.get_face_comparison(media1: img1, media2: img2) { jsonData in
+            self.responseData = jsonData
+            DispatchQueue.main.async {
+                self.gotoResponseView()
+            }
+        }
+    }
+    public func ekyc_get_psddportinfo(img : UIImage) {
+        let ekyc = EKYC()
+        ekyc.get_passportdetails(media1: img, check_expiry: false, check_age: false) { jsonData in
+            self.responseData = jsonData
             DispatchQueue.main.async {
                 self.gotoResponseView()
             }
@@ -102,13 +141,28 @@ extension ViewController {
     private func btnClicked(buttonTag : Int) {
         ImagePickerManager().pickImage(self){ image in
                 //here is the image
+            NineSeven00().addLoder(view: self.view)
             if self.tableModel[self.selectedTag] == "NRC INFO" {
                 self.selectedApi = "NRC INFO"
-                self.apiNRCDetails(img: image)
+                self.ekyc_get_cardinfo(img: image)
             }
             else if self.tableModel[self.selectedTag] == "NRC SIDE INFO" {
                 self.selectedApi = "NRC SIDE INFO"
-                self.apiNRCDetect(img: image)
+                self.ekyc_get_cardside(img: image)
+            }
+            else if self.tableModel[self.selectedTag] == "FACE DETECT" {
+                self.selectedApi = "FACE DETECT"
+                self.ekyc_face_detect(img: image)
+            }
+            else if self.tableModel[self.selectedTag] == "FACE COMPARE" {
+                self.selectedApi = "FACE COMPARE"
+                ImagePickerManager().pickImage(self) { image2 in
+                    self.ekyc_get_comp(img1: image, img2: image2)
+                }
+            }
+            else if self.tableModel[self.selectedTag] == "PASSPORT DETAILS" {
+                self.selectedApi = "PASSPORT DETAILS"
+                self.ekyc_get_psddportinfo(img: image)
             }
         }
     }
