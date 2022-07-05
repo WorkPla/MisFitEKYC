@@ -10,6 +10,7 @@ import MisFitSDK
 import FNineSeven
 
 class ViewController: UIViewController, UINavigationControllerDelegate {
+    private var token = "Token eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoyLCJleHAiOjE2NTQxNTY0NjB9.KyDGBi4yB-QvIjC8PjliDDVlM0add8rG90RoIn0hfnM"
     var selectedTag = -1
 //    private var tableModel = [
 //        "NRC INFO",
@@ -26,7 +27,8 @@ class ViewController: UIViewController, UINavigationControllerDelegate {
         "NRC SIDE INFO",
         "FACE DETECT",
         "FACE COMPARE",
-        "PASSPORT DETAILS"
+        "PASSPORT DETAILS",
+        "NRC INFO WITH LAYER"
     ]
     private var responseData : Any?
     private var selectedApi = ""
@@ -82,7 +84,7 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
 
 extension ViewController {
     private func ekyc_get_cardinfo(img : UIImage) {
-        let ekyc = EKYC()
+        let ekyc = EkycMisfitNonprod(token: self.token)
         ekyc.get_cardinfo(media1: img, cbm: false, filter: true, source: "other", check_age: false) { jsonData in
             self.responseData = jsonData
             DispatchQueue.main.async {
@@ -91,25 +93,34 @@ extension ViewController {
         }
     }
     public func ekyc_get_cardside(img : UIImage) {
-        let ekyc = EKYC()
+        let ekyc = EkycMisfitNonprod(token: self.token)
         ekyc.get_cardside(media1: img) { jsonData in
             self.responseData = jsonData
-            if let dict = jsonData as? [String: Any] {
-                let value = dict["type"] as! String
-                if value == "back" {
-                    
-                }
-                else {
-                    
-                }
-            }
             DispatchQueue.main.async {
                 self.gotoResponseView()
             }
         }
     }
+    public func ekyc_get_cardinfo_with_layer(img : UIImage) {
+        let ekyc = EkycMisfitNonprod(token: self.token)
+        ekyc.get_cardside(media1: img) { jsonData in
+                if let dict = jsonData as? [String: Any] {
+                    let value = dict["type"] as? String
+                    let status_code = dict["status_code"] as? Int
+                    if value == "front" && status_code == 200 {
+                        self.ekyc_get_cardinfo(img: img)
+                    }
+                    else {
+                        self.responseData = jsonData
+                        DispatchQueue.main.async {
+                            self.gotoResponseView()
+                        }
+                    }
+                }
+        }
+    }
     public func ekyc_face_detect(img : UIImage) {
-        let ekyc = EKYC()
+        let ekyc = EkycMisfitNonprod(token: self.token)
         ekyc.get_face_detect(media1: img) { jsonData in
             self.responseData = jsonData
             DispatchQueue.main.async {
@@ -118,7 +129,7 @@ extension ViewController {
         }
     }
     public func ekyc_get_comp(img1 : UIImage, img2 : UIImage) {
-        let ekyc = EKYC()
+        let ekyc = EkycMisfitNonprod(token: self.token)
         ekyc.get_face_comparison(media1: img1, media2: img2) { jsonData in
             self.responseData = jsonData
             DispatchQueue.main.async {
@@ -127,7 +138,7 @@ extension ViewController {
         }
     }
     public func ekyc_get_psddportinfo(img : UIImage) {
-        let ekyc = EKYC()
+        let ekyc = EkycMisfitNonprod(token: self.token)
         ekyc.get_passportdetails(media1: img, check_expiry: false, check_age: false) { jsonData in
             self.responseData = jsonData
             DispatchQueue.main.async {
@@ -163,6 +174,10 @@ extension ViewController {
             else if self.tableModel[self.selectedTag] == "PASSPORT DETAILS" {
                 self.selectedApi = "PASSPORT DETAILS"
                 self.ekyc_get_psddportinfo(img: image)
+            }
+            else if self.tableModel[self.selectedTag] == "NRC INFO WITH LAYER" {
+                self.selectedApi = "NRC INFO WITH LAYER"
+                self.ekyc_get_cardinfo_with_layer(img: image)
             }
         }
     }

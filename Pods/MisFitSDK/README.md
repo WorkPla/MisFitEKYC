@@ -7,7 +7,7 @@ Welcome to the ekyc-ios wiki!
 
 ## Library name: 
 > 
-> pod 'MisFitSDK', '1.1.3'
+> pod 'MisFitSDK', '1.1.4'
 > 
 
 ## Terminal:
@@ -28,62 +28,56 @@ Welcome to the ekyc-ios wiki!
 >
 > import MisFitSDK
 
-- For NRC Side detect
+- For Production initialize object this way
+> let ekyc = EkycMisfit(token: self.token)
+
+- For Non Production initialize object this way
+> let ekyc = EkycMisfitNonprod(token: self.token)
+
+- NRC INFO
 ```
-let apiNRCDetectApi = NRCDetectApi()
-apiNRCDetectApi.apiRequestForNRCDetect(media1: UIImage(named: "NRC") ?? nil) { jsonData in
-        print(jsonData)
+ekyc.get_cardinfo(media1: img, cbm: false, filter: true, source: "other", check_age: false) { jsonData in
+     print(jsonData)
+     // Process the data here
 }
 ```
 
-- For NRC Details
+- NRC SIDE INFO
 ```
-let apiNRCDetailsApi = NRCDetailsApi()
-apiNRCDetailsApi.apiRequestForNrcCDetails(media1: UIImage(named: "NRC") ?? nil) { jsonData in
-    if jsonData == nil {
-        print("NRC Details : error found.")
-    }
-    else {
-        print(jsonData)
-    }
+ekyc.get_cardside(media1: img) { jsonData in
+     print(jsonData)
+     // Process the data here
 }
 ```
 
-- For Facial liveness detection**
+- NRC INFO WITH LAYER
 ```
-let apiFaceDetectApi = FaceDetectApi()
-apiFaceDetectApi.apiRequestForFaceDetect(media1: UIImage(named: "NRC") ?? nil) { jsonData in
-    if jsonData == nil {
-        print("Error: Found Nil.")
-    }
-    else {
-        print(jsonData)
-    }
+ekyc.get_cardinfo_with_layer(media1: UIImage(named: "NRC")) { jsonData in
+  print(jsonData ?? "nil")
 }
 ```
 
-- For Facial Comparison
+- FACE DETECT
 ```
-let faceCompareAPIEngine = FaceCompareApi()
-faceCompareAPIEngine.apiRequestForMatchCompare(
-    media1: UIImage(named: "SELFI")!,
-    fileName1: "image1",
-    media2: UIImage(named: "NRC")!,
-    fileName2: "image2") { (retValue) in
-        print(retValue ?? "nil")
-    }
+ekyc.get_face_detect(media1: img) { jsonData in
+     print(jsonData)
+     // Process the data here
+}
 ```
 
-- For Passport detection
+- FACE COMPARE
 ```
-let apiPassportDetailsApi = PassportDetailsApi()
-apiPassportDetailsApi.apiRequestForPassportDetails(media1: UIImage(named: "Passport") ?? nil) { jsonData in
-    if jsonData == nil {
-        print("Passport Details : Found Nil.")
-    }
-    else {
-        print(jsonData)
-    }
+ekyc.get_face_comparison(media1: img1, media2: img2) { jsonData in
+     print(jsonData)
+     // Process the data here
+}
+```
+
+- PASSPORT DETAILS      
+```
+ekyc.get_passportdetails(media1: img, check_expiry: false, check_age: false) { jsonData in
+     print(jsonData)
+     // Process the data here
 }
 ```
 
