@@ -62,6 +62,7 @@ class ImagePickerManager: NSObject, UIImagePickerControllerDelegate, UINavigatio
     func openGallery(){
         alert.dismiss(animated: true, completion: nil)
         picker.sourceType = .photoLibrary
+        picker.mediaTypes = ["public.image", "public.movie"]
         self.viewController!.present(picker, animated: true, completion: nil)
     }
 

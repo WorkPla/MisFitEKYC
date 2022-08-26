@@ -26,7 +26,7 @@ class BottomPopupView: BottomPopupViewController {
         if let nonNil = value, !(nonNil is NSNull) {
             return String(describing: nonNil)
         }
-        return "Local Log: Data not found."
+        return "Response = nil"
     }
     override var popupHeight: CGFloat { return CGFloat(350) }
     
