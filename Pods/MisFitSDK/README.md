@@ -7,7 +7,7 @@ Welcome to the ekyc-ios wiki!
 
 ## Library name: 
 > 
-> pod 'MisFitSDK', '1.1.17'
+> pod 'MisFitSDK', '1.1.27'
 > 
 
 ## Terminal:
@@ -208,7 +208,7 @@ ekyc.get_cardinfo_with_face(media1: base64String, cbm: false, filter: true, sour
 Use this way to get passport with face detection
 
 ```
-ekyc.get_passportinfo_with_face(media1: base64String, source: "other", check_age: false) { jsonData in
+ekyc.get_passportinfo_with_face(media1: base64String, source : String, check_expiry: false, check_age: false) { jsonData in
     print(jsonData ?? "response = nil")
 }
 ```

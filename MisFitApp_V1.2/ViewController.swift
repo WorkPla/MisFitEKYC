@@ -20,16 +20,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate {
     
     private var token = "Token eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoyLCJleHAiOjE2NTQxNTY0NjB9.KyDGBi4yB-QvIjC8PjliDDVlM0add8rG90RoIn0hfnM"
     var selectedTag = -1
-//    private var tableModel = [
-//        "NRC INFO",
-//        "NRC SIDE INFO",
-//        "FACE DETECT",
-//        "FACE DETECT CAMERA",
-//        "FACE COMPARE",
-//        "PASSPORT DETAILS",
-//        "PASSPORT DETAILS",
-//        "CAMBODIAN NRC"
-//    ]
+
     private var tableModel = [
         "NRC INFO",
         "NRC SIDE INFO",
@@ -38,7 +29,8 @@ class ViewController: UIViewController, UINavigationControllerDelegate {
         "FACE COMPARE FILE",
         "FACE COMPARE STRING",
         "PASSPORT DETAILS",
-        "NRC INFO WITH LAYER"
+        "NRC INFO WITH LAYER",
+        "PASSPORT INFO WITH FACE"
     ]
     private var responseData : Any?
     private var selectedApi = ""
@@ -183,7 +175,18 @@ extension ViewController {
         let im = (img as? UIImage)!.jpegData(compressionQuality: 0.1)! as NSData
         let str : String = im.base64EncodedString(options: [])
         let ekyc = EkycMisfitNonprod(token: self.token)
-        ekyc.get_passportinfo_with_face(media1: str, source: "other", check_age: false) { jsonData in
+        ekyc.get_passportinfo_with_face(media1: str, source: "other", check_expiry: false, check_age: false) { jsonData in
+            self.responseData = jsonData
+            DispatchQueue.main.async {
+                self.gotoResponseView()
+            }
+        }
+    }
+    public func ekyc_get_psddportinfo_with_face(img : UIImage) {
+        let im1 = (img as? UIImage)!.jpegData(compressionQuality: 0.1)! as NSData
+        let str : String = String(im1.base64EncodedString(options: []))
+        let ekyc = EkycMisfitNonprod(token: self.token)
+        ekyc.get_passportinfo_with_face(media1: str, source: "other", check_expiry: false, check_age: false) { jsonData in
             self.responseData = jsonData
             DispatchQueue.main.async {
                 self.gotoResponseView()
@@ -220,37 +223,145 @@ extension ViewController {
     }
     
     private func processData(image : Any?, image2: Any?) {
+        self.selectedApi = self.tableModel[self.selectedTag]
         if self.tableModel[self.selectedTag] == "NRC INFO" {
-            self.selectedApi = "NRC INFO"
-            self.ekyc_get_cardinfo(img: image as! UIImage)
+            if image as? UIImage != nil {
+                self.ekyc_get_cardinfo(img: image as! UIImage)
+            }
+            else if image as? PHLivePhoto != nil {
+                let resources = PHAssetResource.assetResources(for: image as! PHLivePhoto)
+                let photo = resources.first(where: { $0.type == .photo })!
+                let imageData = NSMutableData()
+                
+                PHAssetResourceManager.default().requestData(for: photo, options: nil, dataReceivedHandler: { data in
+                    imageData.append(data)
+                }, completionHandler: { error in
+                    self.ekyc_get_cardinfo(img: UIImage(data: imageData as Data)!)
+                })
+            }
+            else {
+                self.showWarnings(title: "Warning", alertMessage: "Unsupported File.")
+            }
         }
         else if self.tableModel[self.selectedTag] == "NRC SIDE INFO" {
-            self.selectedApi = "NRC SIDE INFO"
-            self.ekyc_get_cardside(img: image as! UIImage)
+            if image as? UIImage != nil {
+                self.ekyc_get_cardside(img: image as! UIImage)
+            }
+            else if image as? PHLivePhoto != nil {
+                let resources = PHAssetResource.assetResources(for: image as! PHLivePhoto)
+                let photo = resources.first(where: { $0.type == .photo })!
+                let imageData = NSMutableData()
+                
+                PHAssetResourceManager.default().requestData(for: photo, options: nil, dataReceivedHandler: { data in
+                    imageData.append(data)
+                }, completionHandler: { error in
+                    self.ekyc_get_cardside(img: UIImage(data: imageData as Data)!)
+                })
+            }
+            else {
+                self.showWarnings(title: "Warning", alertMessage: "Unsupported File.")
+            }
         }
         else if self.tableModel[self.selectedTag] == "FACE DETECT FILE" {
-            self.selectedApi = "FACE DETECT FILE"
-            self.ekyc_face_detect(img: image)
+            if image as? Data != nil {
+                self.ekyc_face_detect(img: image)
+            }
+            else {
+                self.showWarnings(title: "Warning", alertMessage: "Unsupported File.")
+            }
         }
         else if self.tableModel[self.selectedTag] == "FACE DETECT STRING" {
-            self.selectedApi = "FACE DETECT STRING"
-            self.ekyc_face_detect_str(img: image)
+            if image as? UIImage != nil {
+                self.ekyc_face_detect_str(img: image as! UIImage)
+            }
+            else if image as? PHLivePhoto != nil {
+                let resources = PHAssetResource.assetResources(for: image as! PHLivePhoto)
+                let photo = resources.first(where: { $0.type == .photo })!
+                let imageData = NSMutableData()
+                
+                PHAssetResourceManager.default().requestData(for: photo, options: nil, dataReceivedHandler: { data in
+                    imageData.append(data)
+                }, completionHandler: { error in
+                    self.ekyc_face_detect_str(img: UIImage(data: imageData as Data)!)
+                })
+            }
+            else {
+                self.showWarnings(title: "Warning", alertMessage: "Unsupported File.")
+            }
         }
         else if self.tableModel[self.selectedTag] == "FACE COMPARE FILE" {
-            self.selectedApi = "FACE COMPARE FILE"
-            self.ekyc_get_comp(img1: image, img2: image2)
+            if (image as? Data != nil && image2 as? UIImage != nil) || (image as? UIImage != nil && image2 as? Data != nil) {
+                self.ekyc_get_comp(img1: image, img2: image2)
+            }
+            else {
+                self.showWarnings(title: "Warning", alertMessage: "Unsupported File.")
+            }
         }
         else if self.tableModel[self.selectedTag] == "FACE COMPARE STRING" {
-            self.selectedApi = "FACE COMPARE STRING"
-            self.ekyc_get_comp_str(img1: image, img2: image2)
+            if image as? UIImage != nil && image2 as? UIImage != nil {
+                self.ekyc_get_comp_str(img1: image, img2: image2)
+            }
+            else {
+                self.showWarnings(title: "Warning", alertMessage: "Unsupported File.")
+            }
         }
         else if self.tableModel[self.selectedTag] == "PASSPORT DETAILS" {
-            self.selectedApi = "PASSPORT DETAILS"
-            self.ekyc_get_psddportinfo(img: image as! UIImage)
+            if image as? UIImage != nil {
+                self.ekyc_get_psddportinfo(img: image as! UIImage)
+            }
+            else if image as? PHLivePhoto != nil {
+                let resources = PHAssetResource.assetResources(for: image as! PHLivePhoto)
+                let photo = resources.first(where: { $0.type == .photo })!
+                let imageData = NSMutableData()
+                
+                PHAssetResourceManager.default().requestData(for: photo, options: nil, dataReceivedHandler: { data in
+                    imageData.append(data)
+                }, completionHandler: { error in
+                    self.ekyc_get_psddportinfo(img: UIImage(data: imageData as Data)!)
+                })
+            }
+            else {
+                self.showWarnings(title: "Warning", alertMessage: "Unsupported File.")
+            }
         }
         else if self.tableModel[self.selectedTag] == "NRC INFO WITH LAYER" {
-            self.selectedApi = "NRC INFO WITH LAYER"
-            self.ekyc_get_cardinfo_with_layer(img: image as! UIImage)
+            if image as? UIImage != nil {
+                self.ekyc_get_cardinfo_with_layer(img: image as! UIImage)
+            }
+            else if image as? PHLivePhoto != nil {
+                let resources = PHAssetResource.assetResources(for: image as! PHLivePhoto)
+                let photo = resources.first(where: { $0.type == .photo })!
+                let imageData = NSMutableData()
+                
+                PHAssetResourceManager.default().requestData(for: photo, options: nil, dataReceivedHandler: { data in
+                    imageData.append(data)
+                }, completionHandler: { error in
+                    self.ekyc_get_cardinfo_with_layer(img: UIImage(data: imageData as Data)!)
+                })
+            }
+            else {
+                self.showWarnings(title: "Warning", alertMessage: "Unsupported File.")
+            }
+        }
+        else if self.tableModel[self.selectedTag] == "PASSPORT INFO WITH FACE" {
+            print("PASSPORT INFO WITH FACE")
+            if image as? UIImage != nil {
+                self.ekyc_get_psddportinfo_with_face(img: image as! UIImage)
+            }
+            else if image as? PHLivePhoto != nil {
+                let resources = PHAssetResource.assetResources(for: image as! PHLivePhoto)
+                let photo = resources.first(where: { $0.type == .photo })!
+                let imageData = NSMutableData()
+                
+                PHAssetResourceManager.default().requestData(for: photo, options: nil, dataReceivedHandler: { data in
+                    imageData.append(data)
+                }, completionHandler: { error in
+                    self.ekyc_get_psddportinfo_with_face(img: UIImage(data: imageData as Data)!)
+                })
+            }
+            else {
+                self.showWarnings(title: "Warning", alertMessage: "Unsupported File.")
+            }
         }
     }
 }
@@ -258,6 +369,9 @@ extension ViewController: PHPickerViewControllerDelegate {
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
         picker.dismiss(animated: true) { // NB if you don't say this, it won't dismiss!
             print(Thread.isMainThread) // yep
+            if results.count == 0 {
+                NineSeven00().removeLoder(view: self.view)
+            }
             guard let result = results.first else { return }
             // proving you don't get asset id unless you specified library
             let assetid = result.assetIdentifier
@@ -279,6 +393,9 @@ extension ViewController: PHPickerViewControllerDelegate {
                     self.dealWithLivePhoto(result)
                 } else if prov.canLoadObject(ofClass: UIImage.self) {
                     self.dealWithImage(result)
+                }
+                else {
+                    self.showWarnings(title: "Warning", alertMessage: "Unsupported File.")
                 }
             }
             
@@ -398,4 +515,26 @@ extension ViewController {
                 }
             }
         }
+}
+// MARK: - Warning sms
+extension ViewController {
+    private func showWarnings(title : String, alertMessage : String) {
+        let alert = UIAlertController(title: title, message: alertMessage, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Okay", style: .default, handler: { action in
+              switch action.style {
+              case .default:
+                print("default")
+                  NineSeven00().removeLoder(view: self.view)
+              case .cancel:
+                print("cancel")
+
+              case .destructive:
+                print("destructive")
+              @unknown default:
+                print("Unknown default")
+            }}))
+        DispatchQueue.main.async {
+            self.present(alert, animated: true, completion: nil)
+        }
+    }
 }
