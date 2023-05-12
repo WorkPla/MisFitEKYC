@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1240"
+   LastUpgradeVersion = "1300"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "21D229AC38530F627EB983AFA6C2C44C"
-               BuildableName = "FNineSeven.framework"
-               BlueprintName = "FNineSeven"
+               BlueprintIdentifier = "79042F64003F11654B05D2D1C133D377"
+               BuildableName = "Pods_MisFitApp_V1_2.framework"
+               BlueprintName = "Pods-MisFitApp_V1.2"
                ReferencedContainer = "container:Pods.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>

@@ -2,7 +2,7 @@ PODS:
   - Alamofire (4.9.1)
   - BottomPopup (0.7.0)
   - FNineSeven (0.2.1)
-  - IQKeyboardManagerSwift (6.5.10)
+  - IQKeyboardManagerSwift (6.5.11)
   - MisFitSDK (1.1.27):
     - Alamofire (= 4.9.1)
 
@@ -24,9 +24,9 @@ SPEC CHECKSUMS:
   Alamofire: 85e8a02c69d6020a0d734f6054870d7ecb75cf18
   BottomPopup: fe3e284628532f99093ae68c592c6b9d392c972d
   FNineSeven: 104be2b40f899a4416e19708498b84b0d67914d2
-  IQKeyboardManagerSwift: 52962c76ab33532f15ad9f3ff4e5715eda5335bb
+  IQKeyboardManagerSwift: c7955c0bdbf7b2eb29bb7daaa44e3d90f55a9a85
   MisFitSDK: a6bca5550ddf3551204d4c7e0f3244dcb7478e15
 
 PODFILE CHECKSUM: 3a96106d7afc34eb008cd34ae82b311290aaf07b
 
-COCOAPODS: 1.11.2
+COCOAPODS: 1.12.1
